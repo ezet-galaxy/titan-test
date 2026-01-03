@@ -23,11 +23,10 @@ export default function register(req) {
         "Authorization": `Bearer ${process.env.SUPABASE_ANON_KEY}`,
         "Prefer": "return=representation"
       },
-      // ✅ REQUIRED
-      body: JSON.stringify({
+      body: {
         email,
         password_hash
-      })
+      }
     }
   );
 
