@@ -6,8 +6,10 @@ export default function register(req) {
   }
 
   const password_hash = t.password.hash(password);
+  t.log(password_hash)
 
-  if (!password_hash) {
+  // HARD GUARD — REQUIRED
+  if (typeof password_hash !== "string") {
     return { status: 500, error: "Password hashing failed" };
   }
 
@@ -21,26 +23,29 @@ export default function register(req) {
         "Authorization": `Bearer ${process.env.SUPABASE_ANON_KEY}`,
         "Prefer": "return=minimal"
       },
-      body: JSON.stringify({ email, password_hash })
+      // ✅ REQUIRED
+      body: JSON.stringify({
+        email,
+        password_hash
+      })
     }
   );
 
+  // Duplicate email
   if (res.status === 409) {
-    return {
-      status: 409,
-      error: "Email already registered"
-    };
+    return { status: 409, error: "Email already registered" };
   }
 
+  // Any other failure
   if (res.status < 200 || res.status >= 300) {
     return {
       status: res.status,
-      error: "User creation failed"
+      error: res.body || "User creation failed"
     };
   }
 
   return {
-    status: res.status,
+    status: 201,
     message: "User registered successfully"
   };
 }
