@@ -2,16 +2,13 @@ export default function register(req) {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return { status: 400, error: "Email and password required" };
+    return { status: 400, error: "Email and password are required" };
   }
 
   const password_hash = t.password.hash(password);
 
-  if (typeof password_hash !== "string") {
-    return {
-      status: 500,
-      error: "Password service unavailable"
-    };
+  if (!password_hash) {
+    return { status: 500, error: "Password hashing failed" };
   }
 
   const res = t.fetch(
@@ -29,12 +26,21 @@ export default function register(req) {
   );
 
   if (res.status === 409) {
-    return { status: 409, error: "Email already registered" };
+    return {
+      status: 409,
+      error: "Email already registered"
+    };
   }
 
   if (res.status < 200 || res.status >= 300) {
-    return { status: res.status, error: "Insert failed" };
+    return {
+      status: res.status,
+      error: "User creation failed"
+    };
   }
 
-  return { status: 201, message: "User registered" };
+  return {
+    status: res.status,
+    message: "User registered successfully"
+  };
 }
