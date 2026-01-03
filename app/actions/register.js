@@ -21,7 +21,7 @@ export default function register(req) {
         "Content-Type": "application/json",
         "apikey": process.env.SUPABASE_ANON_KEY,
         "Authorization": `Bearer ${process.env.SUPABASE_ANON_KEY}`,
-        "Prefer": "return=minimal"
+        "Prefer": "return=representation"
       },
       // ✅ REQUIRED
       body: JSON.stringify({
@@ -43,6 +43,8 @@ export default function register(req) {
       error: res.body || "User creation failed"
     };
   }
+  t.log("SUPABASE RES:", res);
+
 
   return {
     status: 201,
